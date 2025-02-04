@@ -1,4 +1,7 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const usermodel = require("../modals/usermodel");
+const { json } = require('express/lib/response');
 const registercontroller = async (req,res) =>{
     try {
         // DESTRUCTURE THE DATA YOU ARE RECIEVING FROM THE FRONTEND.
@@ -12,7 +15,9 @@ const registercontroller = async (req,res) =>{
         if(existing){
             return res.send("user already exists!");
         }
-        const user = await usermodel.create(req.body);
+        var salt =await  bcrypt.genSalt(10);
+       const hashedpassword = await bcrypt.hash(password,salt);
+        const user = await usermodel.create({username, email, password:hashedpassword, address, phone});
         res.send({
             message:"user registered !",
             user
@@ -47,10 +52,18 @@ const login = async (req, res) => {
                 message: "Invalid email or password"
             });
         }
-
+        const isMatch = await bcrypt.compare(password, user.password);
+        if(!isMatch){
+            res.send({
+                message:"invalid credentials !"
+            })
+        }
+        const token = jwt.sign({id:user._id},process.env.JWT_SECRET_KEY,{expiresIn:'7d'})
         res.status(200).json({
             status: true,
-            message: "Login successful!"
+            message: "Login successful!",
+            token,
+            user
         });
 
     } catch (error) {
