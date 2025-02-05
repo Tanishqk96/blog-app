@@ -47,4 +47,36 @@ const updateuser = async (req,res) =>{
         })
     }
 }
-module.exports = {getusercontroller, updateuser};
+const resetpassword = async (req,res) =>{
+    try {
+        const {email,answer, newpassword} = req.body;
+        if(!email || !answer || !newpassword){
+            res.status(500).send({
+                success:false,
+                message:"Enter data!" 
+            })
+        }
+        const user = await usermodel.findOne({email,answer});
+        if(!user){
+            res.status(500).send({
+                success:false,
+                message:"No user found !" 
+            })
+        }
+        var salt =await  bcrypt.genSalt(10);
+        const hashedpassword = await bcrypt.hash(newpassword,salt);
+        user.password= hashedpassword;
+        await user.save();
+        res.status(200).send({
+            success:true,
+            message:" Password Updated",
+            user
+        })
+    } catch (error) {
+        res.status(500).send({
+            success:false,
+            message:"There was some error!"
+        })
+    }
+}
+module.exports = {getusercontroller, updateuser, resetpassword};
