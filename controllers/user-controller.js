@@ -79,4 +79,17 @@ const resetpassword = async (req,res) =>{
         })
     }
 }
-module.exports = {getusercontroller, updateuser, resetpassword};
+const deleteuser = async (req,res) =>{
+    try {
+        await usermodel.findByIdAndDelete(req.params.id);
+        res.status(200).send({
+            message:"Your account has been deleted"
+        })
+    } catch (error) {
+        res.status(500).send({
+            success:false,
+            message:"There was some error!"
+        })
+    }
+}
+module.exports = {getusercontroller, updateuser, resetpassword, deleteuser};
