@@ -1,16 +1,23 @@
 const mongoose = require("mongoose");
 
-//schema
-const resturantSchema = new mongoose.Schema(
+// Food Schema
+const foodSchema = new mongoose.Schema({
+  dishName: { type: String, required: true },
+  dishPic: { type: String },
+  price: { type: Number, required: true }
+});
+
+// Restaurant Schema
+const restaurantSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, " Resturant title is required"],
+      required: [true, "Restaurant title is required"],
     },
     imageUrl: {
       type: String,
     },
-    foods: { type: Array },
+    foods: [foodSchema], // Define foods as an array of objects
     time: {
       type: String,
     },
@@ -46,5 +53,4 @@ const resturantSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-//export
-module.exports = mongoose.model("Resturant", resturantSchema);
+module.exports = mongoose.model("Restaurant", restaurantSchema);
